@@ -1,10 +1,15 @@
 # Demo of CLI for Turing and Tensorboard
 
+## Installation
+Do an
+Then
+`julia --project -e "using Pkg; Pkg.instantiate()"`
+## CLI Usage
 To use with default options
 ```bash
 julia --project --threads auto fit.jl
 ```
-(although the `--threads auto` may or may not be useful)
+(although the `--threads auto` may or may not be useful in this example.)
 
 Or with options
 ```bash
