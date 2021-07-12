@@ -1,2 +1,1 @@
 using TuringCLIExample
-TuringCLIExample.main()

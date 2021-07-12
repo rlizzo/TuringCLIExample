@@ -3,15 +3,14 @@
 module TuringCLIExample
 
 using Turing, TuringCallbacks, TensorBoardLogger, ArgParse, StatsPlots, CSV, DataFrames
+import ArgParse.parse_item
 
-function simulate_and_estimate(;
-    num_samples,
-    num_adapts,
-    target_acceptance_rate,
-    s_prior_alpha,
-    s_prior_theta,
-    kwargs...,
-)
+function ArgParse.parse_item(::Type{Vector{Float64}}, x::AbstractString)
+    return parse.(Float64, split(strip(x, [' ','\"',']','[']), ','))
+end
+
+function simulate_and_estimate(d)
+    s_prior_alpha, s_prior_theta = d.prior
     @model function demo(x; s_prior_alpha, s_prior_theta)
         s ~ InverseGamma(s_prior_alpha, s_prior_theta)
         m ~ Normal(0, √s)
@@ -24,10 +23,10 @@ function simulate_and_estimate(;
     model = demo(xs; s_prior_alpha, s_prior_theta)
 
     # Sampling
-    println("Generating $num_samples samples")
+    println("Generating $(d.num_samples) samples")
     callback = TensorBoardCallback("tensorboard_logs/run")
-    alg = NUTS(num_adapts, target_acceptance_rate)
-    chain = sample(model, alg, num_samples; callback)
+    alg = NUTS(d.num_adapts, d.target_acceptance_rate)
+    chain = sample(model, alg, d.num_samples; callback)
 
     println("Generating trace plot")
     trace_plot = plot(chain, seriestype=:traceplot)
@@ -71,19 +70,15 @@ function simulate_and_estimate(;
 end
 
 # Entry for script
-function main()
-    d = parse_commandline()
-
-    # Generic code to convert the dictionary to 
-    dictkeys = (collect(Symbol.(keys(d)))...,)
-    dictvalues = (collect(values(d))...,)
-    args = NamedTuple{dictkeys}(dictvalues)
+function main(args)
+    d = parse_commandline(args)
     # parses converts all arguments to named tuple then splat into solution
-    simulate_and_estimate(; args...)
+    simulate_and_estimate(d)
 end
 
-function parse_commandline()
-    s = ArgParseSettings()
+function parse_commandline(args)
+
+    s = ArgParseSettings(fromfile_prefix_chars=['@'])
 
     @add_arg_table! s begin
         "--num_samples"
@@ -98,33 +93,12 @@ function parse_commandline()
         help = "Target acceptance rate for dual averaging."
         arg_type = Float64
         default = 0.65
-        "--s_prior_alpha"
-        help = "alpha in InverseGamma prior for s"
-        arg_type = Float64
-        default = 2.0
-        "--s_prior_theta"
-        help = "theta in InverseGamma prior for s"
-        arg_type = Float64
-        default = 3.0
+        "--prior"
+        help = "prior parameters in InverseGamma prior for s"
+        arg_type = Vector{Float64}
     end
 
-    return parse_args(s)
+    args_with_default = vcat("@$(pkgdir(TuringCLIExample))/src/defaults.txt", args)
+    return parse_args(args_with_default, s;as_symbols=true)  
 end
-
-# Can experiment later, or can package compiler 
-# function _precompile_()
-#     ccall(:jl_generating_output, Cint, ()) == 1 || return nothing
-#     Base.precompile(Tuple{typeof(main)})
-# end
-
-# # Only really intended for final versions rather than during interactive use
-# # NOTE: Consider commenting out or fix if changing signature of simulate_and_estimte
-# if Base.VERSION >= v"1.4.2"
-#     precompile(Tuple{typeof(TuringCLIExample.main)})
-    
-#     # Is this necessary or does the main() above do it? Comment out if any problem.
-#     precompile(Tuple{TuringCLIExample.var"#simulate_and_estimate##kw", NamedTuple{(:num_samples, :num_adapts, :target_acceptance_rate, :s_prior_theta, :s_prior_alpha), Tuple{Int64, Int64, Float64, Float64, Float64}}, typeof(TuringCLIExample.simulate_and_estimate)})
-
-#     _precompile_()
-# end
 end #module
