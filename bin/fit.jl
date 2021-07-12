@@ -1,2 +1,2 @@
 using TuringCLIExample
-TuringCLIExample.main(ARGS)
+TuringCLIExample.main()

@@ -2,6 +2,7 @@
 
 module TuringCLIExample
 
+using TuringCallbacks: join
 using Turing, TuringCallbacks, TensorBoardLogger, ArgParse, StatsPlots, CSV, DataFrames
 import ArgParse.parse_item
 
@@ -24,7 +25,7 @@ function simulate_and_estimate(d)
 
     # Sampling
     println("Generating $(d.num_samples) samples")
-    callback = TensorBoardCallback("tensorboard_logs/run")
+    callback = TensorBoardCallback(joinpath(pkgdir(TuringCLIExample),"tensorboard_logs/run"))
     alg = NUTS(d.num_adapts, d.target_acceptance_rate)
     chain = sample(model, alg, d.num_samples; callback)
 
@@ -70,29 +71,26 @@ function simulate_and_estimate(d)
 end
 
 # Entry for script
-function main(args)
+function main(args = ARGS)
     d = parse_commandline(args)
-    # parses converts all arguments to named tuple then splat into solution
-    simulate_and_estimate(d)
+    simulate_and_estimate((;d...)) # to named tuple
 end
 
 function parse_commandline(args)
 
     s = ArgParseSettings(fromfile_prefix_chars=['@'])
 
+    # See src/defaults.txt
     @add_arg_table! s begin
         "--num_samples"
         help = "samples to draw in chain"
         arg_type = Int64
-        default = 10000
         "--num_adapts"
         help = "number of adaptations for NUTS"
         arg_type = Int64
-        default = 100
         "--target_acceptance_rate"
         help = "Target acceptance rate for dual averaging."
         arg_type = Float64
-        default = 0.65
         "--prior"
         help = "prior parameters in InverseGamma prior for s"
         arg_type = Vector{Float64}

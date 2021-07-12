@@ -1,4 +1,3 @@
-using Base: precompilableerror
 # Adapted from https://github.com/julia-vscode/julia-vscode/blob/1da85dc37b54723c1bc4b313d2c11a974c7656b4/scripts/tasks/task_compileenv.jl instead
 import Pkg, Libdl, PackageCompiler
 

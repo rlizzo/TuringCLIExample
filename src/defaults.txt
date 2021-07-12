@@ -1,1 +1,4 @@
 --prior=[2.0,3.0]
+--num_samples=10000
+--num_adapts=100
+--target_acceptance_rate=0.65

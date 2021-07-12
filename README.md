@@ -4,16 +4,27 @@
 Do an
 Then
 `julia --project -e "using Pkg; Pkg.instantiate()"`
+
+To build the sysimage
+```bash
+julia --threads auto -e 'using Pkg; Pkg.add("PackageCompiler")'
+julia --threads auto ./deps/create_sysimage.jl
+```
 ## CLI Usage
 To use with default options
 ```bash
-julia --project --threads auto fit.jl
+julia --project --threads auto bin/fit.jl
 ```
 (although the `--threads auto` may or may not be useful in this example.)
 
+Or if you have a sysimage:
+```bash
+julia --project --threads auto --sysimage JuliaSysimage.dll bin/fit.jl
+```
+
 Or with options
 ```bash
-julia --project --threads auto fit.jl --num_samples 1000
+julia --project --threads auto bin/fit.jl --num_samples 1000
 ```
 To run tensorboard, ensure tensorboard is installed (e.g. with  `pip install -r requirements.txt` ) and
 ```bash
@@ -21,7 +32,7 @@ tensorboard --logdir tensorboard_logs
 ```
 ## Options
 ```bash
-❯ julia --project fit.jl --help
+❯ julia --project bin/fit.jl --help
 usage: fit.jl [--num_samples NUM_SAMPLES] [--num_adapts NUM_ADAPTS]
               [--target_acceptance_rate TARGET_ACCEPTANCE_RATE]
               [--s_prior_alpha S_PRIOR_ALPHA]
