@@ -7,7 +7,7 @@ Then
 
 To build the sysimage
 ```bash
-julia --threads auto -e 'using Pkg; Pkg.add("PackageCompiler")'
+julia --threads auto -e 'using Pkg; Pkg.add(\"PackageCompiler\")'
 julia --threads auto ./deps/create_sysimage.jl
 ```
 ## CLI Usage
