@@ -56,3 +56,17 @@ optional arguments:
                         Float64, default: 3.0)
   -h, --help            show this help message and exit
 ```
+## Grid
+
+To run on grid, do `pip install lightning-grid --upgrade` then in this folder,
+```bash
+grid run --instance_type t2.medium --framework julia --name turing-test bin/fit.jl --num_samples 1000
+```
+This may take some time to compile the image, so you can check: `grid status`  To see the logs as it executes:
+```bash
+grid logs hmc-test
+```
+When it is complete,
+```bash
+grid artifacts hmc-test-exp0
+```
