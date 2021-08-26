@@ -1,5 +1,11 @@
 # Demo of CLI for Turing and Tensorboard
 
+To run on grid:
+
+```bash
+grid run --config ./config.yml bin/fit.jl --num_samples "[10000, 20000]"
+```
+
 ## Installation
 Do an
 Then

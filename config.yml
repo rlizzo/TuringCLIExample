@@ -1,0 +1,19 @@
+compute:
+
+  provider:
+    credentials: ""
+    region: us-east-1
+    vendor: aws
+
+  train:
+    cpus: 3
+    gpus: 0
+    instance: t2.xlarge
+    framework: "julia"
+
+    # Actions need to be passed as one command
+    # per line.
+    actions:
+      on_image_build:
+      - julia --threads auto -e 'using Pkg; Pkg.add("PackageCompiler")'
+      - julia --threads auto ./deps/create_sysimage.jl --replace_default
